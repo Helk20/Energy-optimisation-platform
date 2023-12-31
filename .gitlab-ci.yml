@@ -1,10 +1,10 @@
 image: jhipster/jhipster:v7.9.4
 
+  
 cache:
   key: '$CI_COMMIT_REF_NAME'
   paths:
     - .maven/
-
 stages:
   - check
   - build
@@ -13,12 +13,10 @@ stages:
   - package
   - release
   - deploy
-
 before_script:
-  - export MAVEN_USER_HOME=`pwd`/.maven
-  - ./mvnw com.github.eirslett:frontend-maven-plugin:install-node-and-npm -DnodeVersion=v10.13.0 -DnpmVersion=6.4.1 -Dmaven.repo.local=$MAVEN_USER_HOME
-  - ./mvnw com.github.eirslett:frontend-maven-plugin:npm -Dmaven.repo.local=$MAVEN_USER_HOME
-  - sudo apt-get update && sudo apt-get install -y git curl libmcrypt-dev default-mysql-client
+    - export MAVEN_USER_HOME=`pwd`/.maven
+    - ./mvnw com.github.eirslett:frontend-maven-plugin:install-node-and-npm -DnodeVersion=v10.13.0 -DnpmVersion=6.4.1 -Dmaven.repo.local=$MAVEN_USER_HOME
+    - ./mvnw com.github.eirslett:frontend-maven-plugin:npm -Dmaven.repo.local=$MAVEN_USER_HOME
 
 nohttp:
   stage: check
@@ -40,7 +38,9 @@ maven-test:
     - docker:dind
     - mysql:5.7
   variables:
+    # Instruct Testcontainers to use the daemon of DinD.
     DOCKER_HOST: 'tcp://docker:2375'
+    # Improve performance with overlayfs.
     DOCKER_DRIVER: overlay2
 
   stage: test
@@ -52,7 +52,9 @@ maven-test:
     - docker login -u helk1111 -p mK@P-3k_pf6.hNA
     - docker pull mysql:5.7
     - docker run --name feoptimisationenergie -d -p 3304:3306 -it -e MYSQL_ALLOW_EMPTY_PASSWORD=true mysql:5.7
-    - mysql --protocol=tcp -u root -P 3304 -e "create database feoptimisationenergie; use feoptimisationenergie;"
+    - mysql --protocol=tcp -u root -P 3304
+    - create database feoptimisationenergie;
+    - use feoptimisationenergie;
   artifacts:
     reports:
       junit:
@@ -86,7 +88,6 @@ maven-package:
       - target/*.jar
       - target/classes
     expire_in: 1 day
-
 # Uncomment the following line to use gitlabs container registry. You need to adapt the REGISTRY_URL in case you are not using gitlab.com
 #docker-push:
 #    stage: release
